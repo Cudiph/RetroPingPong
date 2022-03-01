@@ -3,16 +3,17 @@ import arcade
 import os
 import settings
 
-ASSET_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'asset') 
+ASSET_PATH = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), '..', 'asset')
 
 
 class Player(arcade.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.texture = arcade.load_texture(os.path.join(ASSET_PATH, 'images', 'racket.png'))
+        self.texture = arcade.load_texture(
+            os.path.join(ASSET_PATH, 'images', 'racket.png'))
         self.scale = settings.PLAYER_SCALE
-
 
     def update(self):
         super().update()
@@ -25,4 +26,3 @@ class Player(arcade.Sprite):
         elif self.top > settings.SCREEN_HEIGHT - 1:
             self.top = settings.SCREEN_HEIGHT - 1
             self.change_y = 0
-

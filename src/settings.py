@@ -1,7 +1,7 @@
 # Windowing
 SCREEN_WIDTH = 1600
 SCREEN_HEIGHT = 720
-TITLE = "Another bad game"
+TITLE = "Retro Ping Pong"
 
 # Player
 PLAYER_SPEED = 10
@@ -12,3 +12,4 @@ BALL_SPEED = 20
 
 # General
 USING_AI = True
+AI_VS_AI = False

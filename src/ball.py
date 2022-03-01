@@ -3,11 +3,13 @@ import os
 import settings
 from player import ASSET_PATH
 
+
 class Ball(arcade.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.texture = arcade.load_texture(os.path.join(ASSET_PATH, 'images', 'ball.png'))
+        self.texture = arcade.load_texture(
+            os.path.join(ASSET_PATH, 'images', 'ball.png'))
         self.scale = 0.3
         self.center_x = settings.SCREEN_WIDTH / 2
         self.center_y = settings.SCREEN_HEIGHT / 2
