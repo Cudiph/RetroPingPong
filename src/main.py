@@ -19,17 +19,38 @@ class RetroPingPong(arcade.Window):
         self.ball_sprites = arcade.SpriteList()
         self.star_list = StarList()
         self.current_event = None
+        self.start = False
+        self.spawn_stars()
+        self.score1 = 0
+        self.score2 = 0
 
     def on_draw(self):
         self.clear()
-        self.player_sprites.draw()
-        self.draw_score()
-        self.ball_sprites.draw()
         self.star_list.draw()
         arcade.draw_text(f'fps: {arcade.get_fps() // 1}',
-                         10, self.height - 20, arcade.color.WHITE, 16)
+                         10, self.height - 20, arcade.color.WHITE, 16, font_name=FONTS)
+
+        # draw welcome message
+        if not self.start:
+            arcade.draw_text(f'Welcome to 2D Ping Pong Space Cadet!', self.width / 2,
+                             self.height * 0.666, arcade.color.WHITE, 40, anchor_x='center', font_name=FONTS)
+            arcade.draw_text(f'Click anywhere or any button to start playing', self.width / 2, self.height *
+                             0.333, arcade.color.WHITE, 20, anchor_x='center', anchor_y='baseline', font_name=FONTS)
+            return
+
+        self.draw_score()
+        self.player_sprites.draw()
+        self.ball_sprites.draw()
+
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        if not self.start:
+            self.setup()
+            self.start = True
 
     def on_key_press(self, symbol: int, modifiers: int):
+        if not self.start:
+            self.setup()
+            self.start = True
         if symbol == arcade.key.ESCAPE:
             self.close()
 
@@ -67,9 +88,11 @@ class RetroPingPong(arcade.Window):
                 self.player2_sprite.change_y = 0
 
     def on_update(self, delta_time: float):
+        self.star_list.update(delta_time)
+        if not self.start:
+            return
         self.player_sprites.update()
         self.ball_sprites.update()
-        self.star_list.update(delta_time)
 
         # collission detection
         collide_with_p1: list[Ball] = self.player1_sprite.collides_with_list(
@@ -123,8 +146,15 @@ class RetroPingPong(arcade.Window):
                 nearest_ball = ball
                 continue
 
-            NEAREST_BALL_DISTANCE = self.distance_x(
+            # get current nearest ball x distance
+            nearest_ball_distance = self.distance_x(
                 player_sprite, nearest_ball)
+            if nearest_ball.change_x > 0 and not in_right:
+                nearest_ball_distance += abs(ball.center_x - self.width) * 2
+            elif nearest_ball.change_x < 0 and in_right:
+                nearest_ball_distance += ball.center_x * 2
+
+            # get ball x distance
             ball_distance = self.distance_x(ball, player_sprite)
             if ball.change_x > 0 and not in_right:
                 ball_distance += abs(ball.center_x - self.width) * 2
@@ -133,7 +163,7 @@ class RetroPingPong(arcade.Window):
                 ball_distance += ball.center_x * 2
                 pass
 
-            if NEAREST_BALL_DISTANCE > ball_distance:
+            if nearest_ball_distance > ball_distance:
                 nearest_ball = ball
 
         # x_ball = nearest_ball.center_x
@@ -146,9 +176,6 @@ class RetroPingPong(arcade.Window):
             player_sprite.center_y += PLAYER_SPEED
 
     def setup(self):
-        self.score1 = 0
-        self.score2 = 0
-
         # player 1 on the left
         self.player1_sprite.center_y = self.height / 2
         self.player1_sprite.left = 80
@@ -160,9 +187,7 @@ class RetroPingPong(arcade.Window):
         self.player_sprites.append(self.player2_sprite)
 
         self.spawn_ball()
-        arcade.schedule(self.rand_event, 5)
-
-        self.spawn_stars()
+        arcade.schedule(self.rand_event, 3)
 
     def spawn_stars(self):
         for i in range(100):
@@ -199,10 +224,10 @@ class RetroPingPong(arcade.Window):
         self.ball_sprites.append(ball_sprite)
 
     def draw_score(self):
-        arcade.draw_text(str(self.score1), self.width / 2 / 2,
-                         self.height / 2 * 1.5, arcade.color.WHITE, 40)
-        arcade.draw_text(str(self.score2), self.width / 2 * 1.5,
-                         self.height / 2 * 1.5, arcade.color.WHITE, 40)
+        arcade.draw_text(f'  {self.score1}  ', self.width / 2 / 2,
+                         self.height / 2 * 1.5, arcade.color.WHITE, 40, font_name=FONTS)
+        arcade.draw_text(f'  {self.score2}  ', self.width / 2 * 1.5,
+                         self.height / 2 * 1.5, arcade.color.WHITE, 40, font_name=FONTS)
 
     def rand_event(self, delta_time):
         self.current_event = None
@@ -219,7 +244,7 @@ class RetroPingPong(arcade.Window):
 
 def main():
     app = RetroPingPong(SCREEN_WIDTH, SCREEN_HEIGHT, TITLE)
-    app.setup()
+    # app.setup()
     arcade.run()
 
 
